@@ -1,0 +1,21 @@
+{
+  "name": "node-mi-flora",
+  "version": "0.0.1",
+  "description": "Node package for xiaomi mi flora plant sensor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "xiaomi",
+    "mi",
+    "flora",
+    "node"
+  ],
+  "author": "Demirhan Aydin",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^2.6.0",
+    "noble": "^1.7.0"
+  }
+}
