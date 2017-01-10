@@ -3,9 +3,15 @@ const noble = require('noble');
 const debug = require('debug')('miflora');
 const DeviceData = require('./lib/device-data');
 
-const DEFAULT_DEVICE_NAME = 'Flower mate';
-const DATA_SERVICE_UUID = '0000120400001000800000805f9b34fb';
-const DATA_CHARACTERISTIC_UUID = '00001a0100001000800000805f9b34fb';
+const DEFAULT_DEVICE_NAME          = 'Flower mate';
+const DATA_SERVICE_UUID            = '0000120400001000800000805f9b34fb';
+const DATA_CHARACTERISTIC_UUID     = '00001a0100001000800000805f9b34fb';
+const FIRMWARE_CHARACTERISTIC_UUID = '00001a0200001000800000805f9b34fb';
+const REALTIME_CHARACTERISTIC_UUID = '00001a0000001000800000805f9b34fb';
+const REALTIME_META_VALUE          = Buffer.from([0xA0, 0x1F]);
+
+const SERVICE_UUIDS        = [DATA_SERVICE_UUID];
+const CHARACTERISTIC_UUIDS = [DATA_CHARACTERISTIC_UUID, FIRMWARE_CHARACTERISTIC_UUID, REALTIME_CHARACTERISTIC_UUID];
 
 class MiFlora extends EventEmitter {
   constructor(macAddress) {
@@ -41,42 +47,58 @@ class MiFlora extends EventEmitter {
   }
 
   listenDevice(peripheral, context) {
-    peripheral.discoverSomeServicesAndCharacteristics([DATA_SERVICE_UUID], [DATA_CHARACTERISTIC_UUID], function(error, services, characteristics) {
+    peripheral.discoverSomeServicesAndCharacteristics(SERVICE_UUIDS, CHARACTERISTIC_UUIDS, function(error, services, characteristics) {
       characteristics.forEach(function(characteristic) {
+        // data
         if (characteristic.uuid == DATA_CHARACTERISTIC_UUID) {
           debug('found characteristics uuid: %s', characteristics.uuid);
-
           characteristic.read(function(error, data) {
             debug("uuid:", characteristic.uuid, "data:", data);
-
-            let temperature = data.readUInt16LE(0) / 10,
-                lux         = data.readUInt32LE(3),
-                moisture    = data.readUInt16BE(6),
-                fertility   = data.readUInt16LE(8),
-                deviceData  = new DeviceData(peripheral.id,
-                                             temperature,
-                                             lux,
-                                             moisture,
-                                             fertility);
-
-            debug("temperature: %s °C", temperature);
-            debug("Light: %s lux", lux);
-            debug("moisture: %s %", moisture);
-            debug("fertility: %s µS/cm", fertility);
-
-            if(context._deviceData[peripheral.id] && context._deviceData[peripheral.id].equal(deviceData)) {
-              debug("same content with the previous one", deviceData);
-            } else {
-              context._deviceData[peripheral.id] = deviceData
-              context.emit('data', deviceData);
-            }
-            peripheral.disconnect();
+            context.parseData(peripheral, data);
           });
-        } else {
-          console.warn('no characteristic found with uuid: %s', DATA_CHARACTERISTIC_UUID);
+        }
+        // firmware & battery
+        if (characteristic.uuid == FIRMWARE_CHARACTERISTIC_UUID) {
+          characteristic.read(function(error, data) {
+            debug("firmware data uuid:", characteristic.uuid, "data:", data);
+            let firmware = {
+              batteryLevel: parseInt(data.toString('hex', 0, 1), 16),
+              firmwareVersion: data.toString('ascii', 2, data.length)
+            }
+            context.emit('firmware', firmware);
+          });
+        }
+        // realtime
+        if (characteristic.uuid == REALTIME_CHARACTERISTIC_UUID) {
+          debug('enabling realtime');
+          characteristic.write(REALTIME_META_VALUE, true);
         }
       });
     });
+  }
+
+  parseData(peripheral, data) {
+    let temperature = data.readUInt16LE(0) / 10,
+        lux         = data.readUInt32LE(3),
+        moisture    = data.readUInt16BE(6),
+        fertility   = data.readUInt16LE(8),
+        deviceData  = new DeviceData(peripheral.id,
+                                     temperature,
+                                     lux,
+                                     moisture,
+                                     fertility);
+
+    debug("temperature: %s °C", temperature);
+    debug("Light: %s lux", lux);
+    debug("moisture: %s %", moisture);
+    debug("fertility: %s µS/cm", fertility);
+
+    if(this._deviceData[peripheral.id] && this._deviceData[peripheral.id].equal(deviceData)) {
+      debug("same content with the previous one", deviceData);
+    } else {
+      this._deviceData[peripheral.id] = deviceData
+      this.emit('data', deviceData);
+    }
   }
 
   startScanning() {
