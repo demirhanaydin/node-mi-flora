@@ -16,8 +16,8 @@ const CHARACTERISTIC_UUIDS = [DATA_CHARACTERISTIC_UUID, FIRMWARE_CHARACTERISTIC_
 class MiFlora extends EventEmitter {
   constructor(macAddress) {
     super();
+    this.noble = noble;
     this._macAddress = macAddress;
-    this._deviceData = [];
     noble.on('discover', this.discover.bind(this));
   }
 
@@ -49,35 +49,30 @@ class MiFlora extends EventEmitter {
   listenDevice(peripheral, context) {
     peripheral.discoverSomeServicesAndCharacteristics(SERVICE_UUIDS, CHARACTERISTIC_UUIDS, function (error, services, characteristics) {
       characteristics.forEach(function (characteristic) {
-        // data
-        if (characteristic.uuid === DATA_CHARACTERISTIC_UUID) {
-          debug('found characteristics uuid: %s', characteristics.uuid);
-          characteristic.read(function (error, data) {
-            debug('uuid:', characteristic.uuid, 'data:', data);
-            context.parseData(peripheral, data);
-          });
-        }
-        // firmware & battery
-        if (characteristic.uuid === FIRMWARE_CHARACTERISTIC_UUID) {
-          characteristic.read(function (error, data) {
-            debug('firmware data uuid:', characteristic.uuid, 'data:', data);
-            let firmware = {
-              batteryLevel: parseInt(data.toString('hex', 0, 1), 16),
-              firmwareVersion: data.toString('ascii', 2, data.length)
-            };
-            context.emit('firmware', firmware);
-          });
-        }
-        // realtime
-        if (characteristic.uuid === REALTIME_CHARACTERISTIC_UUID) {
-          debug('enabling realtime');
-          characteristic.write(REALTIME_META_VALUE, true);
+        switch (characteristic.uuid) {
+          case DATA_CHARACTERISTIC_UUID:
+            characteristic.read(function (error, data) {
+              context.parseData(peripheral, data);
+            });
+            break;
+          case FIRMWARE_CHARACTERISTIC_UUID:
+            characteristic.read(function (error, data) {
+              context.parseFirmwareData(peripheral, data);
+            });
+            break;
+          case REALTIME_CHARACTERISTIC_UUID:
+            debug('enabling realtime');
+            characteristic.write(REALTIME_META_VALUE, true);
+            break;
+          default:
+            debug('found characteristic uuid %s but not matched the criteria', characteristic.uuid);
         }
       });
     });
   }
 
   parseData(peripheral, data) {
+    debug('data:', data);
     let temperature = data.readUInt16LE(0) / 10;
     let lux = data.readUInt32LE(3);
     let moisture = data.readUInt16BE(6);
@@ -93,20 +88,29 @@ class MiFlora extends EventEmitter {
     debug('moisture: %s %', moisture);
     debug('fertility: %s µS/cm', fertility);
 
-    if (this._deviceData[peripheral.id] && this._deviceData[peripheral.id].equal(deviceData)) {
-      debug('same content with the previous one', deviceData);
-    } else {
-      this._deviceData[peripheral.id] = deviceData;
-      this.emit('data', deviceData);
-    }
+    this.emit('data', deviceData);
+  }
+
+  parseFirmwareData(peripheral, data) {
+    debug('firmware data:', data);
+    let firmware = {
+      batteryLevel: parseInt(data.toString('hex', 0, 1), 16),
+      firmwareVersion: data.toString('ascii', 2, data.length)
+    };
+    this.emit('firmware', firmware);
   }
 
   startScanning() {
-    noble.on('stateChange', function (state) {
-      if (state === 'poweredOn') {
-        noble.startScanning([], true);
-      }
-    });
+    if (noble.state === 'poweredOn') {
+      noble.startScanning([], true);
+    } else {
+      // bind event to start scanning
+      noble.on('stateChange', function (state) {
+        if (state === 'poweredOn') {
+          noble.startScanning([], true);
+        }
+      });
+    }
   }
 
   stopScanning() {
