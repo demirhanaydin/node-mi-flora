@@ -8,7 +8,6 @@ flora.on('data', function (data) {
   console.log('data', data);
 });
 
-flora.on('firmware', function(data) {
+flora.on('firmware', function (data) {
   console.log('firmware', data);
-})
-
+});
