@@ -12,7 +12,7 @@
     "flora",
     "node"
   ],
-  "author": "Demirhan Aydin",
+  "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "debug": "^2.6.0",
@@ -23,5 +23,12 @@
   },
   "xo": {
     "space": true
+  },
+  "engines" : {
+    "node" : ">=6.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/demirhanaydin/node-mi-flora.git"
   }
 }
