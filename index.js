@@ -94,6 +94,7 @@ class MiFlora extends EventEmitter {
   parseFirmwareData(peripheral, data) {
     debug('firmware data:', data);
     let firmware = {
+      deviceId: peripheral.id,
       batteryLevel: parseInt(data.toString('hex', 0, 1), 16),
       firmwareVersion: data.toString('ascii', 2, data.length)
     };
