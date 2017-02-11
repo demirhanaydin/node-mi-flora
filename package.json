@@ -1,6 +1,6 @@
 {
   "name": "node-mi-flora",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node package for xiaomi mi flora plant sensor",
   "main": "index.js",
   "scripts": {
@@ -24,8 +24,8 @@
   "xo": {
     "space": true
   },
-  "engines" : {
-    "node" : ">=6.9"
+  "engines": {
+    "node": ">=6.9"
   },
   "repository": {
     "type": "git",
