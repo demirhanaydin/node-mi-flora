@@ -43,7 +43,7 @@ When data available, it publishes plain object which contains firmware and batte
 ```js
 flora.on('firmware', function (data) {
   console.log('firmware', data);
-  // print { batteryLevel: 82, firmwareVersion: '2.6.2' }
+  // print { deviceId: '1111', batteryLevel: 82, firmwareVersion: '2.6.2' }
 });
 ```
 
