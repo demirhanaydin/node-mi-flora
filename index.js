@@ -3,33 +3,40 @@ const noble = require('noble');
 const debug = require('debug')('miflora');
 const DeviceData = require('./lib/device-data');
 
-const DEFAULT_DEVICE_NAME = 'Flower mate';
 const DATA_SERVICE_UUID = '0000120400001000800000805f9b34fb';
 const DATA_CHARACTERISTIC_UUID = '00001a0100001000800000805f9b34fb';
 const FIRMWARE_CHARACTERISTIC_UUID = '00001a0200001000800000805f9b34fb';
 const REALTIME_CHARACTERISTIC_UUID = '00001a0000001000800000805f9b34fb';
-const REALTIME_META_VALUE = Buffer.from([0xA0, 0x1F]);
 
-const SERVICE_UUIDS = [DATA_SERVICE_UUID];
-const CHARACTERISTIC_UUIDS = [DATA_CHARACTERISTIC_UUID, FIRMWARE_CHARACTERISTIC_UUID, REALTIME_CHARACTERISTIC_UUID];
+const defaultOpts = {
+  DEFAULT_DEVICE_NAME: 'Flower mate',
+  DATA_SERVICE_UUID: DATA_SERVICE_UUID,
+  DATA_CHARACTERISTIC_UUID: DATA_CHARACTERISTIC_UUID,
+  FIRMWARE_CHARACTERISTIC_UUID: FIRMWARE_CHARACTERISTIC_UUID,
+  REALTIME_CHARACTERISTIC_UUID: REALTIME_CHARACTERISTIC_UUID,
+  REALTIME_META_VALUE: Buffer.from([0xA0, 0x1F]),
+  SERVICE_UUIDS: [DATA_SERVICE_UUID],
+  CHARACTERISTIC_UUIDS: [DATA_CHARACTERISTIC_UUID, FIRMWARE_CHARACTERISTIC_UUID, REALTIME_CHARACTERISTIC_UUID],
+};
 
 class MiFlora extends EventEmitter {
-  constructor(macAddress) {
+  constructor(macAddress, opts) {
     super();
     this.noble = noble;
+    this.options = Object.assign(defaultOpts, opts);
     this._macAddress = macAddress;
-    noble.on('discover', this.discover.bind(this));
+    noble.on('discover', (per) => this.discover(per));
   }
 
   discover(peripheral) {
     debug('device discovered: ', peripheral.advertisement.localName);
-    if (this._macAddress !== undefined) {
+    if (this._macAddress) {
       if (this._macAddress.toLowerCase() === peripheral.address.toLowerCase()) {
         debug('trying to connect mi flora, living at %s', this._macAddress);
         // start listening the specific device
         this.connectDevice(peripheral);
       }
-    } else if (peripheral.advertisement.localName === DEFAULT_DEVICE_NAME) {
+    } else if (peripheral.advertisement.localName === this.options.DEFAULT_DEVICE_NAME) {
       debug('no mac address specified, trying to connect available mi flora...');
       // start listening found device
       this.connectDevice(peripheral);
@@ -40,29 +47,29 @@ class MiFlora extends EventEmitter {
     // prevent simultanious connection to the same device
     if (peripheral.state === 'disconnected') {
       peripheral.connect();
-      peripheral.once('connect', function () {
+      peripheral.once('connect', () => {
         this.listenDevice(peripheral, this);
-      }.bind(this));
+      });
     }
   }
 
   listenDevice(peripheral, context) {
-    peripheral.discoverSomeServicesAndCharacteristics(SERVICE_UUIDS, CHARACTERISTIC_UUIDS, function (error, services, characteristics) {
-      characteristics.forEach(function (characteristic) {
+    peripheral.discoverSomeServicesAndCharacteristics(this.options.SERVICE_UUIDS, this.options.CHARACTERISTIC_UUIDS, (error, services, characteristics) => {
+      characteristics.forEach((characteristic) => {
         switch (characteristic.uuid) {
-          case DATA_CHARACTERISTIC_UUID:
-            characteristic.read(function (error, data) {
+          case this.options.DATA_CHARACTERISTIC_UUID:
+            characteristic.read((error, data) => {
               context.parseData(peripheral, data);
             });
             break;
-          case FIRMWARE_CHARACTERISTIC_UUID:
-            characteristic.read(function (error, data) {
+          case this.options.FIRMWARE_CHARACTERISTIC_UUID:
+            characteristic.read((error, data) => {
               context.parseFirmwareData(peripheral, data);
             });
             break;
-          case REALTIME_CHARACTERISTIC_UUID:
+          case this.options.REALTIME_CHARACTERISTIC_UUID:
             debug('enabling realtime');
-            characteristic.write(REALTIME_META_VALUE, true);
+            characteristic.write(this.options.REALTIME_META_VALUE, true);
             break;
           default:
             debug('found characteristic uuid %s but not matched the criteria', characteristic.uuid);
@@ -78,10 +85,10 @@ class MiFlora extends EventEmitter {
     let moisture = data.readUInt16BE(6);
     let fertility = data.readUInt16LE(8);
     let deviceData = new DeviceData(peripheral.id,
-                                    temperature,
-                                    lux,
-                                    moisture,
-                                    fertility);
+      temperature,
+      lux,
+      moisture,
+      fertility);
 
     debug('temperature: %s °C', temperature);
     debug('Light: %s lux', lux);
@@ -102,11 +109,13 @@ class MiFlora extends EventEmitter {
   }
 
   startScanning() {
+    debug('BT state', noble.state);
     if (noble.state === 'poweredOn') {
       noble.startScanning([], true);
     } else {
       // bind event to start scanning
-      noble.on('stateChange', function (state) {
+      noble.on('BT stateChange', (state) => {
+        debug('noble state change', state);
         if (state === 'poweredOn') {
           noble.startScanning([], true);
         }

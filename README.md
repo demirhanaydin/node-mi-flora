@@ -29,6 +29,37 @@ setInterval(function () {
 flora.stopScanning();
 ```
 
+## Configuration
+
+### MAC Address
+If you know the mac address of the device you'd like to connect to, you 
+can pass it as an optional parameter to the constructor in the first position
+```js
+let flora = new MiFlora('00:0a:95:9d:68:16');
+```
+
+### Options
+By default node-mi-flora uses the following parameters to interact with the 
+plant sensor:
+* DEFAULT_DEVICE_NAME = 'Flower mate';
+* DATA_SERVICE_UUID = '0000120400001000800000805f9b34fb';
+* DATA_CHARACTERISTIC_UUID = '00001a0100001000800000805f9b34fb';
+* FIRMWARE_CHARACTERISTIC_UUID = '00001a0200001000800000805f9b34fb';
+* REALTIME_CHARACTERISTIC_UUID = '00001a0000001000800000805f9b34fb';
+* REALTIME_META_VALUE = Buffer.from([0xA0, 0x1F]);
+* SERVICE_UUIDS = ['00001a0100001000800000805f9b34fb'];
+* CHARACTERISTIC_UUIDS = ['00001a0100001000800000805f9b34fb', 
+'00001a0200001000800000805f9b34fb', '00001a0000001000800000805f9b34fb'];
+
+You can override these values by passing a second parameter to the constructor.
+
+For example:
+```js
+let flora = new MiFlora(null, {
+  DEFAULT_DEVICE_NAME: 'Flower care'
+});
+``` 
+
 ## Events
 ### Data
 When data available, it publishes DeviceData object which contains temperature, lux, moisture, and fertility.
