@@ -1,6 +1,6 @@
 {
   "name": "node-mi-flora",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node package for xiaomi mi flora plant sensor",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,13 @@
     "node"
   ],
   "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
+  "contributors": [
+    {
+      "name": "Williams A Aguilera",
+      "email": "webnator@gmail.com",
+      "url": "https://github.com/webnator/"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "debug": "^2.6.0",
