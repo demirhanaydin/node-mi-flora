@@ -56,3 +56,5 @@ run ```sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)```. This gra
 
 - use it with strict mode
 ```node --use_strict examples/basic.js```
+
+- if your flora's firmware version is older than 2.8.6, please install [v0.1.0](https://github.com/demirhanaydin/node-mi-flora/tree/v0.1.0)
