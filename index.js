@@ -3,7 +3,7 @@ const noble = require('noble');
 const debug = require('debug')('miflora');
 const DeviceData = require('./lib/device-data');
 
-const DEFAULT_DEVICE_NAME = 'Flower mate';
+const DEFAULT_DEVICE_NAME = 'Flower care';
 const DATA_SERVICE_UUID = '0000120400001000800000805f9b34fb';
 const DATA_CHARACTERISTIC_UUID = '00001a0100001000800000805f9b34fb';
 const FIRMWARE_CHARACTERISTIC_UUID = '00001a0200001000800000805f9b34fb';
@@ -62,7 +62,7 @@ class MiFlora extends EventEmitter {
             break;
           case REALTIME_CHARACTERISTIC_UUID:
             debug('enabling realtime');
-            characteristic.write(REALTIME_META_VALUE, true);
+            characteristic.write(REALTIME_META_VALUE, false);
             break;
           default:
             debug('found characteristic uuid %s but not matched the criteria', characteristic.uuid);
