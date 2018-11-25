@@ -18,7 +18,16 @@ class MiFlora extends EventEmitter {
     super();
     this.noble = noble;
     this._macAddress = macAddress;
+    this._wantsScan = false;
     noble.on('discover', this.discover.bind(this));
+    noble.on('stateChange', this.stateChange.bind(this));
+  }
+
+  stateChange(state){
+    if (this._wantsScan) {
+      this._wantsScan = false;
+      this.startScanning();
+    }
   }
 
   discover(peripheral) {
@@ -106,11 +115,7 @@ class MiFlora extends EventEmitter {
       noble.startScanning([], true);
     } else {
       // bind event to start scanning
-      noble.on('stateChange', function (state) {
-        if (state === 'poweredOn') {
-          noble.startScanning([], true);
-        }
-      });
+      this._wantsScan = true;
     }
   }
 
