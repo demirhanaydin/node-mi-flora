@@ -21,16 +21,21 @@ class MiFlora extends EventEmitter {
     noble.on('discover', this.discover.bind(this));
   }
 
+  cleanAddress(address) {
+    return address.toLowerCase().replace(/[:-]/g, "");
+  }
+
+  isValidAddress(address) {
+    return (
+      this._macAddress == null ||
+      this.cleanAddress(this._macAddress) === this.cleanAddress(address)
+    );
+  }
+
   discover(peripheral) {
     debug('device discovered: ', peripheral.advertisement.localName);
-    if (this._macAddress !== undefined) {
-      if (this._macAddress.toLowerCase() === peripheral.address.toLowerCase()) {
-        debug('trying to connect mi flora, living at %s', this._macAddress);
-        // start listening the specific device
-        this.connectDevice(peripheral);
-      }
-    } else if (peripheral.advertisement.localName === DEFAULT_DEVICE_NAME) {
-      debug('no mac address specified, trying to connect available mi flora...');
+    if (this.isValidAddress(peripheral.address) || this.isValidAddress(peripheral.id)) {
+      debug('trying to connect mi flora, living at %s', peripheral.id);
       // start listening found device
       this.connectDevice(peripheral);
     }
