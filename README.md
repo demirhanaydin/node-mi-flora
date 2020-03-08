@@ -1,47 +1,50 @@
-# node-mi-flora
+# ts-mi-flora
 
 Node package for Xiaomi Mi Flora Plant Sensor
 
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
-
-> This package is under development. Use it on your own risk until the stable version is out.
+> This package is a fork of node-mi-flora and a rewrite in typescript. I will create a pull request 
+> and try to merge it with the regular project 
 
 ## Installation
 ```sh
-npm install node-mi-flora
+npm install ts-mi-flora
 ```
 ## Basic Usage
-```js
-const MiFlora = require('node-mi-flora');
+```typescript
+import {MiFlora} from 'ts-mi-flora';
+import { NodeMiFloraEvents, MiFloraDataEvent, MiFloraFirmwareEvent } from 'ts-mi-flora/dist/types';
 
-let flora = new MiFlora(); // initialize flora
+const flora = new MiFlora();
 
-// start scanning
 flora.startScanning();
 
-// set an interval to rescan & get fresh data
-setInterval(function () {
-  console.log('every 15 seconds, rescan devices');
-  flora.startScanning();
-}, 15000);
+flora.on(NodeMiFloraEvents.DATA, (data: MiFloraDataEvent) => {
+    console.log('data', data);
+});
 
-// stop scanning
-flora.stopScanning();
+flora.on(NodeMiFloraEvents.FIRMWARE, (data: MiFloraFirmwareEvent) => {
+    console.log('firmware', data);
+});
+
+setInterval(() => {
+    console.log('every 15 seconds, rescan devices');
+    flora.startScanning();
+}, 15000);
 ```
 
 ## Events
 ### Data
 When data available, it publishes DeviceData object which contains temperature, lux, moisture, and fertility.
-```js
-flora.on('data', function (data) {
+```typescript
+flora.on(NodeMiFloraEvents.DATA, (data: MiFloraDataEvent) => {
   console.log('data', data);
   // print DeviceData { deviceId: '1111', temperature: 25.2, lux: 5142, moisture: 46, fertility: 0 }
 });
 ```
 ### Firmware & Battery
 When data available, it publishes plain object which contains firmware and battery values.
-```js
-flora.on('firmware', function (data) {
+```typescript
+flora.on(NodeMiFloraEvents.FIRMWARE, (data: MiFloraFirmwareEvent) => {
   console.log('firmware', data);
   // print { deviceId: '1111', batteryLevel: 82, firmwareVersion: '2.6.2' }
 });
@@ -49,12 +52,12 @@ flora.on('firmware', function (data) {
 
 ## Notes
 - debug mode
-```DEBUG=miflora node examples/basic.js```
+```DEBUG=miflora ts-node examples/basic.ts```
 
 - if you having trouble running the script on raspberry pi,
 run ```sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)```. This grants the ```node``` binary ```cap_net_raw privileges```, so it can start/stop BLE advertising without sudo. [source](https://github.com/sandeepmistry/noble#running-without-rootsudo)
 
 - use it with strict mode
-```node --use_strict examples/basic.js```
+```ts-node --use_strict examples/basic.ts```
 
 - if your flora's firmware version is older than 2.8.6, please install [v0.1.0](https://github.com/demirhanaydin/node-mi-flora/tree/v0.1.0)
