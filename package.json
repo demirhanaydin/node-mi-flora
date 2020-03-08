@@ -14,7 +14,7 @@
         "node",
         "typescript"
     ],
-    "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
+    "author": "Luca Becker <luca.becker@me.com>",
     "contributors": [
         {
             "name": "Williams A Aguilera",
@@ -26,8 +26,8 @@
             "url": "https://github.com/bepitulaz"
         },
         {
-            "name": "Luca Becker",
-            "url": "https://sunbury.xyz"
+            "name": "Demirhan Aydin",
+            "url": "https://github.com/demirhanaydin"
         }
     ],
     "license": "MIT",
