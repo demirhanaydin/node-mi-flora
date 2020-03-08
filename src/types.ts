@@ -32,3 +32,17 @@ export enum NodeMiFloraEvents {
     DATA = 'data',
     FIRMWARE = 'firmware'
 }
+
+export interface MiFloraDataEvent {
+    deviceId: string;
+    temperature: number;
+    lux: number;
+    moisture: number;
+    fertility: number;
+}
+
+export interface MiFloraFirmwareEvent {
+    deviceId: string;
+    batteryLevel: number;
+    firmwareVersion: string;
+}

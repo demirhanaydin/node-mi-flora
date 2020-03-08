@@ -3,7 +3,7 @@ import * as noble from '@abandonware/noble';
 import {Peripheral} from '@abandonware/noble';
 import {
     DEFAULT_DEVICE_NAME,
-    MAC_ADDRESS,
+    MAC_ADDRESS, MiFloraFirmwareEvent,
     MiFloraUUIDs,
     NobleEvents,
     NoblePeripheralEvents, NodeMiFloraEvents,
@@ -107,7 +107,7 @@ export class MiFlora extends EventEmitter {
 
     private parseFirmwareData(peripheral: Peripheral, data: Buffer) {
         this.debugger.log('firmware data:', data);
-        let firmware = {
+        let firmware: MiFloraFirmwareEvent = {
             deviceId: peripheral.id,
             batteryLevel: parseInt(data.toString('hex', 0, 1), 16),
             firmwareVersion: data.toString('ascii', 2, data.length)
