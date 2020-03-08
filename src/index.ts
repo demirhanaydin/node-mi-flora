@@ -25,7 +25,7 @@ export class MiFlora extends EventEmitter {
 
     private readonly debugger: Debugger;
 
-    constructor(private readonly macAddress: MAC_ADDRESS) {
+    constructor(private readonly macAddress?: MAC_ADDRESS) {
         super();
         this.noble = noble;
         this.debugger = debug(NAMESPACE);
