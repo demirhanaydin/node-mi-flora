@@ -1,7 +1,7 @@
 {
-    "name": "node-mi-flora",
+    "name": "ts-mi-flora",
     "version": "0.2.0",
-    "description": "Node package for xiaomi mi flora plant sensor",
+    "description": "Node package for xiaomi mi flora plant sensor - typescript fork",
     "main": "dist/index.js",
     "scripts": {
         "test": "xo",
@@ -11,7 +11,8 @@
         "xiaomi",
         "mi",
         "flora",
-        "node"
+        "node",
+        "typescript"
     ],
     "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
     "contributors": [
