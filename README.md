@@ -6,12 +6,12 @@ Node package for Xiaomi Mi Flora Plant Sensor
 
 ## Installation
 ```sh
-npm install ts-mi-flora
+npm install node-mi-flora
 ```
 ## Basic Usage
 ```typescript
-import {MiFlora} from 'ts-mi-flora';
-import { NodeMiFloraEvents, MiFloraDataEvent, MiFloraFirmwareEvent } from 'ts-mi-flora/dist/types';
+import {MiFlora} from 'node-mi-flora';
+import { NodeMiFloraEvents, MiFloraDataEvent, MiFloraFirmwareEvent } from 'node-mi-flora/dist/types';
 
 const flora = new MiFlora();
 
