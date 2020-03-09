@@ -1,5 +1,5 @@
 {
-    "name": "ts-mi-flora",
+    "name": "node-mi-flora",
     "version": "0.2.1",
     "description": "Node package for xiaomi mi flora plant sensor - typescript fork",
     "main": "dist/index.js",

@@ -1,9 +1,8 @@
-# ts-mi-flora
+# node-mi-flora
 
 Node package for Xiaomi Mi Flora Plant Sensor
 
-> This package is a fork of node-mi-flora and a rewrite in typescript. I will create a pull request 
-> and try to merge it with the regular project 
+> This package is under development. Use it on your own risk until the stable version is out.
 
 ## Installation
 ```sh
