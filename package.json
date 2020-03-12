@@ -1,45 +1,58 @@
 {
-  "name": "node-mi-flora",
-  "version": "0.1.1",
-  "description": "Node package for xiaomi mi flora plant sensor",
-  "main": "index.js",
-  "scripts": {
-    "test": "xo"
-  },
-  "keywords": [
-    "xiaomi",
-    "mi",
-    "flora",
-    "node"
-  ],
-  "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
-  "contributors": [
-    {
-      "name": "Williams A Aguilera",
-      "email": "webnator@gmail.com",
-      "url": "https://github.com/webnator/"
+    "name": "node-mi-flora",
+    "version": "0.2.2",
+    "description": "Node package for xiaomi mi flora plant sensor - typescript fork",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "xo",
+        "build": "tsc --outDir dist/"
     },
-    {
-      "name": "Asep Bagja Priandana",
-      "url": "https://github.com/bepitulaz"
+    "keywords": [
+        "xiaomi",
+        "mi",
+        "flora",
+        "node",
+        "typescript"
+    ],
+    "author": "Demirhan Aydin <demirhanaydin@gmail.com>",
+    "contributors": [
+        {
+            "name": "Williams A Aguilera",
+            "email": "webnator@gmail.com",
+            "url": "https://github.com/webnator/"
+        },
+        {
+            "name": "Asep Bagja Priandana",
+            "url": "https://github.com/bepitulaz"
+        },
+        {
+            "name": "Luca Becker",
+            "url": "https://sunbury.xyz"
+        }
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "@abandonware/noble": "^1.9.2-7",
+        "debug": "^4.1.1"
+    },
+    "devDependencies": {
+        "@types/debug": "^4.1.5",
+        "@types/node": "^13.9.0",
+        "@typescript-eslint/eslint-plugin": "^2.22.0",
+        "@typescript-eslint/parser": "^2.22.0",
+        "eslint": "^6.8.0",
+        "eslint-config-google": "^0.14.0",
+        "typescript": "^3.8.3",
+        "xo": "^0.27.2"
+    },
+    "xo": {
+        "space": true
+    },
+    "engines": {
+        "node": ">=6.9"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lucavb/node-mi-flora.git"
     }
-  ],
-  "license": "MIT",
-  "dependencies": {
-    "debug": "^2.6.0",
-    "noble": "^1.7.0"
-  },
-  "devDependencies": {
-    "xo": "^0.17.1"
-  },
-  "xo": {
-    "space": true
-  },
-  "engines": {
-    "node": ">=6.9"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/demirhanaydin/node-mi-flora.git"
-  }
 }
