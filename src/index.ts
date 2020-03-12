@@ -1,5 +1,5 @@
 import {EventEmitter} from 'events';
-import * as noble from '@abandonware/noble';
+import {noble} from "./nobleWrapper";
 import {Peripheral} from '@abandonware/noble';
 import {
     DEFAULT_DEVICE_NAME,
@@ -29,7 +29,7 @@ export class MiFlora extends EventEmitter {
         super();
         this.noble = noble;
         this.debugger = debug(NAMESPACE);
-        noble.on(NobleEvents.DISCOVER, this.discover.bind(this));
+        this.noble.on(NobleEvents.DISCOVER, this.discover.bind(this));
     }
 
     discover(peripheral: Peripheral) {
